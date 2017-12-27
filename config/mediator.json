@@ -1,0 +1,50 @@
+{
+  "urn": "urn:cs300ohie:default-clinical-encounter",
+  "version": "0.1.0",
+  "name": "Default mediator for querying ang saving clinical encounters",
+  "defaultChannelConfig": [
+    {
+      "name": "Default Clinical Encounter",
+      "urlPattern": "/encounters/.*",
+      "alerts": [],
+      "txRerunAcl": [],
+      "txViewFullAcl": [],
+      "txViewAcl": [],
+      "properties": [],
+      "matchContentTypes": [],
+      "routes": [
+        {
+          "name": "Default Clinical Encounter",
+          "host": "default-clinical-encounter.cs300ohie.net",
+          "port": "80",
+          "primary": true,
+          "type": "http"
+        }
+      ],
+      "allow": ["tut"],
+      "type": "http"
+    }
+  ],
+  "endpoints": [
+    {
+      "name": "Default Clinical Encounter",
+      "host": "default-clinical-encounter.cs300ohie.net",
+      "path": "/",
+      "port": "80",
+      "primary": true,
+      "type": "http"
+    }
+  ],
+  "configDefs": [
+    {
+      "param": "upstreamUrl",
+      "displayName": "Upstream URL",
+      "description": "The URL of the service upstream of the mediator",
+      "type": "string",
+      "template": []
+    }
+  ],
+  "config": {
+    "upstreamUrl": "http://default-il.cs300ohie.net:5000"
+  }
+}
