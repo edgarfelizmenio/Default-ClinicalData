@@ -52,8 +52,43 @@ def get_encounters(patient_id):
     return create_openhim_response_object(response, orchestration_results, properties)
     
 
-def add_encounter(patient_id):
-    pass
+def save_encounter(data):
+    orchestration_results = []
+
+    # validate client data and enrich record
+    patient_object, patient_orchestration, status_code = create_orchestration('http://default-cr.cs300ohie.net', 
+                                                                 '/patient/{}'.format(data['patient_id']), 
+                                                                 'Validate Patient Information', 
+                                                                 'GET')
+    orchestration_results.append(patient_orchestration)
+    # validate all provider data and enrich record
+    for provider in data['providers']:
+        provider_info, provider_orchestration, status_code = create_orchestration('http://default-hwr.cs300ohie.net',
+                                                                    '/provider/{}'.format(provider['provider_id']),
+                                                                    'Validate Provider',
+                                                                    'GET')
+    orchestration_results.append(provider_orchestration)    
+    # validate location data and enrich record
+    location_info, location_orchestration, status_code = create_orchestration('http://default-fr.cs300ohie.net',
+                                                                 '/location/{}'.format(data['location_id']),
+                                                                 'Validate Location',
+                                                                 'GET')
+    orchestration_results.append(location_orchestration)
+
+    encounter_id, orchestration, status_code = create_orchestration('http://source-shr.cs300ohie.net',
+                                                                    '/encounters',
+                                                                    'Create Encounter',
+                                                                    'POST',
+                                                                    headers={'Content-Type': 'application/json'},
+                                                                    request_body=data)
+    orchestration_results.append(orchestration)
+
+    response = create_response_object(status_code, encounter_id)
+    properties = {
+        'patient id': data['patient_id'],
+        'encounter id': encounter_id
+    }
+    return create_openhim_response_object(response, orchestration_results, properties)
 
 
 def create_openhim_response_object(response, orchestrations, properties):
@@ -65,10 +100,11 @@ def create_openhim_response_object(response, orchestrations, properties):
         'properties': properties
     }
 
-def create_orchestration(domain, path, name, method, headers={}, params='', request_body=''):
+def create_orchestration(domain, path, name, method, headers=None, params='', request_body=None):
     orchestration_url = domain + path + params
 
-    response = requests.request(method ,orchestration_url)
+    response = requests.request(method ,orchestration_url, headers = headers, json = request_body if request_body else None)
+
     context_object = response.json()
 
     if context_object is None:
