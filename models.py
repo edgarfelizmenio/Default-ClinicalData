@@ -67,7 +67,7 @@ def save_encounter(data):
                                                                     '/provider/{}'.format(provider['provider_id']),
                                                                     'Validate Provider',
                                                                     'GET')
-    orchestration_results.append(provider_orchestration)    
+        orchestration_results.append(provider_orchestration)
     # validate location data and enrich record
     location_info, location_orchestration, status_code = create_orchestration('http://default-fr.cs300ohie.net',
                                                                  '/location/{}'.format(data['location_id']),
@@ -83,13 +83,12 @@ def save_encounter(data):
                                                                     request_body=data)
     orchestration_results.append(orchestration)
 
-    response = create_response_object(status_code, encounter_id)
     properties = {
         'patient id': data['patient_id'],
         'encounter id': encounter_id
     }
+    response = create_response_object(status_code, {'encounter_id': encounter_id})
     return create_openhim_response_object(response, orchestration_results, properties)
-
 
 def create_openhim_response_object(response, orchestrations, properties):
     return {
@@ -116,7 +115,7 @@ def create_orchestration(domain, path, name, method, headers=None, params='', re
             'path': path,
             'headers': headers,
             'querystring': params,
-            'body': request_body,
+            'body': json.dumps(request_body),
             'method': method,
             'timestamp': str(int(datetime.datetime.now().timestamp()*100))
         },
@@ -134,7 +133,7 @@ def create_response_object(status_code, body):
         'headers': {
             'content-type': 'application/json'
         },
-        'body': body,
+        'body': json.dumps(body),
         'timestamp': str(int(datetime.datetime.now().timestamp()*100))
     }
 
