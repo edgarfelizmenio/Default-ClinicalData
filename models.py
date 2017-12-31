@@ -12,7 +12,7 @@ def get_encounters(patient_id):
                                                                  'GET')
     orchestration_results.append(patient_orchestration)
 
-    encounter_ids, encounter_id_orchestration, status_code = create_orchestration('http://source-shr.cs300ohie.net',
+    encounter_ids, encounter_id_orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
                                                                      '/encounters/patient/{}'.format(patient_id),
                                                                      'Get Encounter Ids',
                                                                      'GET')
@@ -20,7 +20,7 @@ def get_encounters(patient_id):
 
     encounters = []
     for encounter_id in encounter_ids:
-        encounter_object, encounter_orchestration, status_code = create_orchestration('http://source-shr.cs300ohie.net',
+        encounter_object, encounter_orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
                                                                          '/encounters/{}'.format(encounter_id),
                                                                          'Get Encounters',
                                                                          'GET')
@@ -75,7 +75,7 @@ def save_encounter(data):
                                                                  'GET')
     orchestration_results.append(location_orchestration)
 
-    encounter_id, orchestration, status_code = create_orchestration('http://source-shr.cs300ohie.net',
+    encounter_id, orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
                                                                     '/encounters',
                                                                     'Create Encounter',
                                                                     'POST',
