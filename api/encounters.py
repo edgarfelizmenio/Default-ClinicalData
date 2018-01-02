@@ -3,8 +3,8 @@ from flask import request, jsonify
 
 import models
 
-@app.route('/encounters/<int:patient_id>', methods = ['GET', 'POST'])
-def encounter(patient_id):
+@app.route('/encounters/patient/<int:patient_id>', methods = ['GET', 'POST'])
+def encounter_patient(patient_id):
     if request.method == 'GET':
         result = models.get_encounters(patient_id)
         if result is None:
@@ -21,6 +21,15 @@ def encounter(patient_id):
         mediator_response = jsonify(result)
         mediator_response.headers["Content-Type"] = 'application/json+openhim'
         return mediator_response
+
+@app.route('/encounters/<int:encounter_id>', methods = ['GET'])
+def encounter(encounter_id):
+    result = models.get_encounter(encounter_id)
+    if result is None:
+        return {'status': 400, 'message': 'Encounter with id={} not found'.format(encounter_id)}
+    mediator_response = jsonify(result)
+    mediator_response.headers["Content-Type"] = 'application/json+openhim'
+    return mediator_response
 
 @app.route('/encounters/', methods = ['POST'])
 def save_encounter():

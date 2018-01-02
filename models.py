@@ -50,7 +50,42 @@ def get_encounters(patient_id):
     patient_object['encounters'] = encounters
     response = create_response_object(status_code, patient_object)
     return create_openhim_response_object(response, orchestration_results, properties)
-    
+
+def get_encounter(encounter_id):
+    orchestration_results = []
+    encounter_object, encounter_orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
+                                                                     '/encounters/{}'.format(encounter_id),
+                                                                     'Get Encounters',
+                                                                     'GET')
+    orchestration_results.append(encounter_orchestration)
+    providers = []  
+    for provider in encounter_object['providers']:
+        provider_info, provider_orchestration, status_code = create_orchestration('http://default-hwr.cs300ohie.net',
+                                                                     '/provider/{}'.format(provider['provider_id']),
+                                                                     'Get Provider',
+                                                                     'GET')
+        orchestration_results.append(provider_orchestration)
+        provider['attributes'] = provider_info['attributes']
+        provider['identifier'] = provider_info['identifier']
+        provider['name'] = provider_info['name']
+        providers.append(provider_info)
+
+    location_info, location_orchestration, status_code = create_orchestration('http://default-fr.cs300ohie.net',
+                                                                '/location/{}'.format(encounter_object['location_id']),
+                                                                'Get Location',
+                                                                'GET')
+    orchestration_results.append(location_orchestration)
+    encounter_object['location_name'] = location_info['name']    
+    properties = {
+        'Encounter': 'id: {}, Patient id: {}, {}, {}, {}'.format(
+            encounter['encounter_id'], 
+            encounter['patient_id'],
+            encounter['encounter_type_description'],
+            encounter['location_name'],
+            encounter['encounter_datetime'])
+    }
+    response = create_response_object(status_code, encounter_object)
+    return create_openhim_response_object(response, orchestration_results, properties)
 
 def save_encounter(data):
     orchestration_results = []
