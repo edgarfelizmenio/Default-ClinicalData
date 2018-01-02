@@ -5,7 +5,7 @@
   "defaultChannelConfig": [
     {
       "name": "Default Clinical Encounter",
-      "urlPattern": "/encounters/.*",
+      "urlPattern": "^/encounters/.*$",
       "alerts": [],
       "txRerunAcl": [],
       "txViewFullAcl": [],
