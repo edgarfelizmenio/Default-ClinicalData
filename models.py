@@ -73,12 +73,12 @@ def get_encounter(encounter_id):
         # validate patient
         cr_future = executor.submit(create_orchestration, 
                                     'http://default-cr.cs300ohie.net', 
-                                    '/patient/{}'.format(data['patient_id']), 
+                                    '/patient/{}'.format(encounter_object['patient_id']), 
                                     'Validate Patient Information', 
                                     'GET')
         # validate providers
         provider_futures = []
-        for provider in data['providers']:
+        for provider in encounter_object['providers']:
             provider_future = executor.submit(create_orchestration, 
                             'http://default-hwr.cs300ohie.net',
                             '/provider/{}'.format(provider_id),
@@ -88,7 +88,7 @@ def get_encounter(encounter_id):
         # validate facility
         facility_future = executor.submit(create_orchestration,
                                           'http://default-fr.cs300ohie.net',
-                                          '/location/{}'.format(data['location_id']),
+                                          '/location/{}'.format(encounter_object['location_id']),
                                           'Validate Location',
                                           'GET')
 
@@ -114,11 +114,11 @@ def get_encounter(encounter_id):
 
     properties = {
         'Encounter': 'id: {}, Patient id: {}, {}, {}, {}'.format(
-            encounter['encounter_id'], 
-            encounter['patient_id'],
-            encounter['encounter_type_description'],
-            encounter['location_name'],
-            encounter['encounter_datetime'])
+            encounter_object['encounter_id'], 
+            encounter_object['patient_id'],
+            encounter_object['encounter_type_description'],
+            encounter_object['location_name'],
+            encounter_object['encounter_datetime'])
     }
     response = create_response_object(status_code, encounter_object)
     return create_openhim_response_object(response, orchestration_results, properties)
