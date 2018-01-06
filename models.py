@@ -81,7 +81,7 @@ def get_encounter(encounter_id):
         for provider in encounter_object['providers']:
             provider_future = executor.submit(create_orchestration, 
                             'http://default-hwr.cs300ohie.net',
-                            '/provider/{}'.format(provider_id),
+                            '/provider/{}'.format(provider['provider_id']),
                             'Validate Provider',
                             'GET')
             provider_futures.append(provider_future)
