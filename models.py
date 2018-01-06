@@ -218,7 +218,7 @@ def create_response_object(status_code, body):
 
 def create_properties_object(patient, encounters):
     properties = {
-        'patient name': patient['family_name'] + patient['middle_name'],
+        'patient name': patient['family_name'] + ', ' + patient['given_name'],
         'city': patient['city'],
         'gender': patient['gender']
     }
