@@ -3,7 +3,7 @@ import concurrent.futures
 import requests
 
 from utils.config import *
-import config
+from config import *
 
 def get_encounters(patient_id):
     # validate user
