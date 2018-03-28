@@ -2,7 +2,7 @@ import requests
 import datetime
 
 # fetch encounter
-response = requests.get('http://127.0.0.1:5000/encounters/101')
+response = requests.get('{}/encounters/101'.format(shr_url))
 
 print(response.json())
 print(response.headers)
@@ -61,8 +61,8 @@ encounter2 = {
 }
 
 headers = {'Content-Type': 'application/json'}
-response1 = requests.post('http://127.0.0.1:5000/encounters/', json=encounter1, headers=headers)
-response2 = requests.post('http://127.0.0.1:5000/encounters/{}'.format(patient_id), json=encounter2, headers=headers)
+response1 = requests.post('{}/encounters/'.format(shr_url), json=encounter1, headers=headers)
+response2 = requests.post('{}/encounters/{}'.format(shr_url, patient_id), json=encounter2, headers=headers)
 
 print("response 1:", response1, response1.json(), response1.headers)
 print()

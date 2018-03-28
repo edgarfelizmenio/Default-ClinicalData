@@ -3,17 +3,18 @@ import concurrent.futures
 import requests
 
 from utils.config import *
+import config
 
 def get_encounters(patient_id):
     # validate user
     orchestration_results = []
-    patient_object, patient_orchestration, status_code = create_orchestration('http://default-cr.cs300ohie.net', 
+    patient_object, patient_orchestration, status_code = create_orchestration(cr_url, 
                                                                  '/patient/{}'.format(patient_id), 
                                                                  'Get Patient Information', 
                                                                  'GET')
     orchestration_results.append(patient_orchestration)
 
-    encounter_ids, encounter_id_orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
+    encounter_ids, encounter_id_orchestration, status_code = create_orchestration(shr_url,
                                                                      '/encounters/patient/{}'.format(patient_id),
                                                                      'Get Encounter Ids',
                                                                      'GET')
@@ -21,7 +22,7 @@ def get_encounters(patient_id):
 
     encounters = []
     for encounter_id in encounter_ids:
-        encounter_object, encounter_orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
+        encounter_object, encounter_orchestration, status_code = create_orchestration(shr_url,
                                                                          '/encounters/{}'.format(encounter_id),
                                                                          'Get Encounters',
                                                                          'GET')
@@ -31,13 +32,13 @@ def get_encounters(patient_id):
             provider_futures = []
             for provider in encounter_object['providers']:
                 provider_future = executor.submit(create_orchestration, 
-                                                  'http://default-hwr.cs300ohie.net',
+                                                  hwr_url,
                                                   '/provider/{}'.format(provider['provider_id']),
                                                   'Get Provider',
                                                   'GET')
                 provider_futures.append(provider_future)
             location_future = executor.submit(create_orchestration, 
-                                              'http://default-fr.cs300ohie.net',
+                                              fr_url,
                                               '/location/{}'.format(encounter_object['location_id']),
                                               'Get Location',
                                               'GET')
@@ -63,7 +64,7 @@ def get_encounters(patient_id):
 def get_encounter(encounter_id):
     orchestration_results = []
 
-    encounter_object, encounter_orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
+    encounter_object, encounter_orchestration, status_code = create_orchestration(shr_url,
                                                                      '/encounters/{}'.format(encounter_id),
                                                                      'Get Encounters',
                                                                      'GET')
@@ -72,7 +73,7 @@ def get_encounter(encounter_id):
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         # validate patient
         cr_future = executor.submit(create_orchestration, 
-                                    'http://default-cr.cs300ohie.net', 
+                                    cr_url, 
                                     '/patient/{}'.format(encounter_object['patient_id']), 
                                     'Validate Patient Information', 
                                     'GET')
@@ -80,14 +81,14 @@ def get_encounter(encounter_id):
         provider_futures = []
         for provider in encounter_object['providers']:
             provider_future = executor.submit(create_orchestration, 
-                            'http://default-hwr.cs300ohie.net',
+                            hwr_url,
                             '/provider/{}'.format(provider['provider_id']),
                             'Validate Provider',
                             'GET')
             provider_futures.append(provider_future)
         # validate facility
         facility_future = executor.submit(create_orchestration,
-                                          'http://default-fr.cs300ohie.net',
+                                          fr_url,
                                           '/location/{}'.format(encounter_object['location_id']),
                                           'Validate Location',
                                           'GET')
@@ -129,7 +130,7 @@ def save_encounter(data):
     with concurrent.futures.ThreadPoolExecutor(max_workers=4) as executor:
         # validate patient
         cr_future = executor.submit(create_orchestration, 
-                                    'http://default-cr.cs300ohie.net', 
+                                    cr_url, 
                                     '/patient/{}'.format(data['patient_id']), 
                                     'Validate Patient Information', 
                                     'GET')
@@ -137,14 +138,14 @@ def save_encounter(data):
         provider_futures = []
         for provider in data['providers']:
             provider_future = executor.submit(create_orchestration, 
-                            'http://default-hwr.cs300ohie.net',
+                            hwr_url,
                             '/provider/{}'.format(provider['provider_id']),
                             'Validate Provider',
                             'GET')
             provider_futures.append(provider_future)
         # validate facility
         facility_future = executor.submit(create_orchestration,
-                                          'http://default-fr.cs300ohie.net',
+                                          fr_url,
                                           '/location/{}'.format(data['location_id']),
                                           'Validate Location',
                                           'GET')
@@ -154,7 +155,7 @@ def save_encounter(data):
             orchestration_results.append(provider_futures[i].result()[1])
         orchestration_results.append(facility_future.result()[1])
 
-    encounter_id, orchestration, status_code = create_orchestration('http://default-shr.cs300ohie.net',
+    encounter_id, orchestration, status_code = create_orchestration(shr_url,
                                                                     '/encounters',
                                                                     'Create Encounter',
                                                                     'POST',
