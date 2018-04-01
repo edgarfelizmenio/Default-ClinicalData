@@ -22,7 +22,9 @@
         }
       ],
       "allow": ["tut"],
-      "type": "http"
+      "type": "http",
+      "authType": "public",
+      "methods": ["GET", "HEAD", "POST", "PUT", "DELETE", "CONNECT", "OPTIONS", "TRACE", "PATCH"]
     }
   ],
   "endpoints": [

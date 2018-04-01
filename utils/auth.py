@@ -1,6 +1,7 @@
 import hashlib
 import requests
 import warnings
+import logging
 
 authUserMap = {}
 
@@ -9,7 +10,6 @@ def authenticate(username, apiURL, rejectUnauthorized):
         'url': '{}/authenticate/{}'.format(apiURL, username),
         'rejectUnauthorized': rejectUnauthorized,
     }
-
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
         response = requests.get(requestOptions['url'], verify = rejectUnauthorized)
