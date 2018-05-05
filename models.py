@@ -93,7 +93,7 @@ def get_encounter(encounter_id):
                                           'Validate Location',
                                           'GET')
 
-        patient_info, patient_orchestration, patient_status_code = cr_future.result()
+        patient_info, patient_orchestration, status_code = cr_future.result()
         encounter_object['patient_name'] = '{} {}'.format(patient_info['given_name'], patient_info['family_name'])
         encounter_object['gender'] = patient_info['gender']
         encounter_object['city'] = patient_info['city']
@@ -102,14 +102,14 @@ def get_encounter(encounter_id):
         orchestration_results.append(patient_orchestration)
 
         for i in range(len(encounter_object['providers'])):
-            provider_info, provider_orchestration, provider_status_code = provider_futures[i].result()
+            provider_info, provider_orchestration, status_code = provider_futures[i].result()
             provider = encounter_object['providers'][i]
             provider['attributes'] = provider_info['attributes']
             provider['identifier'] = provider_info['identifier']
             provider['name'] = provider_info['name']
             orchestration_results.append(provider_orchestration)
         
-        facility_info, facility_orchestration, facility_status_code = facility_future.result()
+        facility_info, facility_orchestration, status_code = facility_future.result()
         encounter_object['location_name'] = facility_info['name']
         orchestration_results.append(facility_orchestration)
 
